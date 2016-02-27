@@ -30,7 +30,7 @@ I lament that I absolutely dropped the ball on testing.  I actually had a
 
 
 terminal open the entire time so that I could continuously reload specific
-modules and hand-test outputs.o
+modules and hand-test outputs.
 
 Nonetheless, it would still be a useful exercise for me to experiment with
 QuickCheck and HSpec when I get a chance.
