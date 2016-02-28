@@ -63,9 +63,9 @@ trySlidingNumber :: Maybe Int -> Board -> IO ()
 trySlidingNumber Nothing _           = abortGame
 trySlidingNumber (Just number) board =
     case slideNumber number board of
-        (Left InvalidNumber)            -> reportError board "That number is not on the board."
-        (Left NumberNotAdjacentToBlank) -> reportError board "That number is not next to the blank spot."
-        (Right board)                   -> checkVictory board
+        Left InvalidNumber            -> reportError board "That number is not on the board."
+        Left NumberNotAdjacentToBlank -> reportError board "That number is not next to the blank spot."
+        Right board                   -> checkVictory board
 
 -- Report error messages at the top of a cleared screen.
 reportError :: Board -> String -> IO ()
