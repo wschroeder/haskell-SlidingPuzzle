@@ -77,27 +77,27 @@ resetScreen = do
   clearScreen
   setCursorPosition 0 0
 
+data TryRead a = Read Int | TryAgain | Quit
+
 -- Prompt for and accept a positive number or Q to quit.
 getPositiveNumber :: String -> IO (Maybe Int)
 getPositiveNumber prompt = queryUser
 
-    where parseNumber ""             = queryUser
-          parseNumber "Q"            = return Nothing
-          parseNumber response
-              | all isDigit response = ensurePositive (read response)
-              | otherwise            = reportError
-
-          ensurePositive number
-              | number > 0           = return (Just number)
-              | otherwise            = reportError
-
-          reportError = do
-              putStrLn "You must enter a positive number."
-              putStrLn ""
-              queryUser
+    where parseNumber :: String -> TryRead a
+          parseNumber ""             = TryAgain
+          parseNumber "q"            = Quit
+          parseNumber "Q"            = Quit
+          parseNumber response | all isDigit response && (read response > 0) =
+            Read (read response)
+          parseNumber _              = TryAgain
 
           queryUser = do
               putStr prompt
               hFlush stdout
               response <- getLine
-              parseNumber (map toUpper response)
+              case parseNumber response of
+                Read n   -> return (Just n)
+                TryAgain -> do
+                  putStrLn "You must enter a positive number.\n"
+                  queryUser
+                Quit     -> return Nothing
