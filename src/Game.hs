@@ -22,7 +22,9 @@ playGame = do
         resetScreen
         board <- newBoard d
         playBoard board
-      Just _  -> putStrLn "These dimensions make for an uninteresting game.  Try again.\n"
+      Just _  -> do
+        putStrLn "These dimensions make for an uninteresting game.  Try again.\n"
+        playGame
       Nothing -> abortGame
 
 isSaneBoard :: Dimensions -> Bool
