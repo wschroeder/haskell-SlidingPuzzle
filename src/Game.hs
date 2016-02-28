@@ -33,8 +33,7 @@ verifySaneBoard _ Nothing = abortGame
 verifySaneBoard (Just width) (Just height)
     | width * height >= 4 = constructBoard width height
     | otherwise           = do
-        putStrLn "These dimensions make for an uninteresting game.  Try again."
-        putStrLn ""
+        putStrLn "These dimensions make for an uninteresting game.  Try again.\n"
         askAboutDimensions
 
 -- Fourth success state is to construct a board based on the given dimensions.
@@ -47,9 +46,7 @@ constructBoard width height = do
 
 -- Easy state transition for aborting out of the game.
 abortGame :: IO ()
-abortGame = do
-    putStrLn "Aborting game."
-    putStrLn ""
+abortGame = putStrLn "Aborting game.\n"
 
 -- Fifth success state is to show the board and prompt the player for a move.
 playBoard :: Board -> IO ()
@@ -89,8 +86,7 @@ winGame :: Board -> IO ()
 winGame board = do
     clearScreen
     putStrLn $ show board
-    putStrLn "You won the game!"
-    putStrLn ""
+    putStrLn "You won the game!\n"
 
 -- Prompt for and accept a positive number or Q to quit.
 getPositiveNumber :: String -> IO (Maybe Int)
