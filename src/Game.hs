@@ -15,17 +15,22 @@ playGame :: IO ()
 playGame = do
     putStrLn "Let's choose a board size."
     width  <- getPositiveNumber "How many spots wide should the board be (Q to abort)? "
-    height <- getPositiveNumber "How many spots high should the board be (Q to abort)? "
-    let dimens = Dimensions <$> width <*> height
-    case dimens of
-      Just d | isSaneBoard d -> do
-        resetScreen
-        board <- newBoard d
-        playBoard board
-      Just _  -> do
-        putStrLn "These dimensions make for an uninteresting game.  Try again.\n"
-        playGame
+    case width of
       Nothing -> abortGame
+      Just w -> do
+        height <- getPositiveNumber "How many spots high should the board be (Q to abort)? "
+        case height of
+          Nothing -> abortGame
+          Just h -> do
+            let dimens = Dimensions w h
+            if isSaneBoard dimens
+              then do
+                resetScreen
+                board <- newBoard dimens
+                playBoard board
+              else do
+                putStrLn "These dimensions make for an uninteresting game.  Try again.\n"
+                playGame
 
 isSaneBoard :: Dimensions -> Bool
 isSaneBoard (Dimensions width height) = width * height >= 4
