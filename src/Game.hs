@@ -81,24 +81,23 @@ resetScreen = do
 getPositiveNumber :: String -> IO (Maybe Int)
 getPositiveNumber prompt = queryUser
 
-  where
-    parseNumber ""             = queryUser
-    parseNumber "Q"            = return Nothing
-    parseNumber response
-        | all isDigit response = ensurePositive (read response)
-        | otherwise            = reportError
+    where parseNumber ""             = queryUser
+          parseNumber "Q"            = return Nothing
+          parseNumber response
+              | all isDigit response = ensurePositive (read response)
+              | otherwise            = reportError
 
-    ensurePositive number
-        | number > 0           = return (Just number)
-        | otherwise            = reportError
+          ensurePositive number
+              | number > 0           = return (Just number)
+              | otherwise            = reportError
 
-    reportError = do
-        putStrLn "You must enter a positive number."
-        putStrLn ""
-        queryUser
+          reportError = do
+              putStrLn "You must enter a positive number."
+              putStrLn ""
+              queryUser
 
-    queryUser = do
-        putStr prompt
-        hFlush stdout
-        response <- getLine
-        parseNumber (map toUpper response)
+          queryUser = do
+              putStr prompt
+              hFlush stdout
+              response <- getLine
+              parseNumber (map toUpper response)
