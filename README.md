@@ -14,7 +14,7 @@ also run `stack` with the [official docker container for Haskell](https://hub.do
     $ stack exec SlidingPuzzle
 
 
-## Motivation and Experience
+## Motivation
 
 This is an experiment to test my current abilities with Haskell.  I was
 motivated by @dummey to try this out while he explored the same project in
