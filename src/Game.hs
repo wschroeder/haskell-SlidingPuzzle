@@ -77,13 +77,13 @@ resetScreen = do
   clearScreen
   setCursorPosition 0 0
 
-data TryRead a = Read Int | TryAgain | Quit
+data TryRead a = Read a | TryAgain | Quit
 
 -- Prompt for and accept a positive number or Q to quit.
 getPositiveNumber :: String -> IO (Maybe Int)
 getPositiveNumber prompt = queryUser
 
-    where parseNumber :: String -> TryRead a
+    where parseNumber :: String -> TryRead Int
           parseNumber ""             = TryAgain
           parseNumber "q"            = Quit
           parseNumber "Q"            = Quit
