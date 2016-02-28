@@ -43,8 +43,8 @@ numberAt (Board (Dimensions width height) layout) (Position x y)
 -- Slide numbers around the board until the layout is pretty far removed from
 -- the original board layout.
 scrambleBoard :: (RandomGen g) => Board -> Board -> g -> Board
-scrambleBoard board@(Board (Dimensions width height) _) startingBoard gen =
-    scrambleBoardLoop board gen $ (width * height)^2
+scrambleBoard board@(Board (Dimensions width height) _) startingBoard initialGen =
+    scrambleBoardLoop board initialGen $ (width * height)^2
     where scrambleBoardLoop board gen 0          = board
           scrambleBoardLoop board gen iterations =
               let (moveIndex, newGen)   = randomR (0, 3) gen
