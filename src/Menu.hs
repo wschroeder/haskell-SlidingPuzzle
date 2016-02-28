@@ -4,7 +4,7 @@ module Menu (
 
 import System.IO
 import Data.Char
-import Game as G
+import qualified Game as G
 import Screen (clearScreen)
 
 runMenu :: IO ()

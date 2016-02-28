@@ -9,9 +9,9 @@ module Board (
     Height
 ) where
 
-import Data.List as L
-import System.Random as R
-import Text.Printf as Text
+import qualified Data.List as L
+import qualified System.Random as R
+import qualified Text.Printf as Text
 
 type Width            = Int
 type Height           = Int
@@ -44,12 +44,12 @@ numberAt (Board (Dimensions width height) layout) (Position x y)
 
 -- Slide numbers around the board until the layout is pretty far removed from
 -- the original board layout.
-scrambleBoard :: (RandomGen g) => Board -> Board -> g -> Board
+scrambleBoard :: (R.RandomGen g) => Board -> Board -> g -> Board
 scrambleBoard board@(Board (Dimensions width height) _) startingBoard initialGen =
     scrambleBoardLoop board initialGen $ (width * height)^2
     where scrambleBoardLoop board gen 0          = board
           scrambleBoardLoop board gen iterations =
-              let (moveIndex, newGen)   = randomR (0, 3) gen
+              let (moveIndex, newGen)   = R.randomR (0, 3) gen
                   (moveX, moveY)        = [(-1, 0), (1, 0), (0, -1), (0, 1)] !! moveIndex
                   (Just (Position x y)) = positionOf Nothing board
                   newX                  = x + moveX
@@ -74,7 +74,7 @@ newBoard d = do
 -- Find where a number or Nothing is on the board.
 positionOf :: PositionValue -> Board -> Maybe Position
 positionOf item (Board (Dimensions width _) layout) =
-    case elemIndex item layout of
+    case L.elemIndex item layout of
         Just index -> Just $ Position (index `rem` width) (index `div` width)
         Nothing    -> Nothing
 
