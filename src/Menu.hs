@@ -18,7 +18,7 @@ runMenu = do
     putStr "Choice: "
     hFlush stdout
     response <- getLine
-    processInput $ map Data.Char.toUpper response
+    processInput (map Data.Char.toUpper response)
 
 processInput :: String -> IO ()
 processInput "P" = do
@@ -31,6 +31,5 @@ processInput _   = do
     runMenu
 
 respond message = do
-    clearScreen
-    setCursorPosition 0 0
+    G.resetScreen
     putStrLn message

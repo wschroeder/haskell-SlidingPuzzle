@@ -4,7 +4,9 @@ module Board (
     isStartingLayout,
     Dimensions(..),
     Board(..),
-    SlideError(..)
+    SlideError(..),
+    Width,
+    Height
 ) where
 
 import Data.List as L
@@ -24,7 +26,7 @@ data SlideError       = InvalidNumber | NumberNotAdjacentToBlank deriving (Show,
 instance Show Board where
     show b@(Board (Dimensions width height) _) =
         unlines $ map showRow [0..height-1]
-        where showRow y               = foldl (++) "" $ map (\x -> showPosition b $ Position x y) [0..width-1]
+        where showRow y               = concat $ map (\x -> showPosition b $ Position x y) [0..width-1]
               showPosition b p        = Text.printf "%2s " $ translateValue $ numberAt b p
               translateValue (NumberPosition Nothing)  = "__"
               translateValue (NumberPosition (Just x)) = show x
@@ -60,14 +62,14 @@ scrambleBoard board@(Board (Dimensions width height) _) startingBoard gen =
                in verifyBoard newBoard gen iterations
           verifyBoard board gen iterations
               | board == startingBoard = scrambleBoardLoop board gen iterations
-              | otherwise              = scrambleBoardLoop board gen (pred iterations)
+              | otherwise              = scrambleBoardLoop board gen (iterations - 1)
 
 -- | Randomly generate a new board, given dimensions.
 newBoard :: Dimensions -> IO Board
 newBoard d = do
     newGen <- R.newStdGen
-    return $ scrambleBoard startingBoard startingBoard newGen
-    where startingBoard = calculateStartingBoard $ Board d []
+    return (scrambleBoard startingBoard startingBoard newGen)
+    where startingBoard = calculateStartingBoard (Board d [])
 
 -- Find where a number or Nothing is on the board.
 positionOf :: PositionValue -> Board -> Maybe Position
@@ -86,10 +88,10 @@ slideNumber number board =
           validateAndSlideNumber (Just blankPosition) (Just numberPosition)
                 | nextTo blankPosition numberPosition = Right $ swapNumberAndBlank number board
                 | otherwise                           = Left NumberNotAdjacentToBlank
-          nextTo (Position bx by) (Position nx ny)    =
-                (nx == bx && (ny == by-1 || ny == by+1)) ||
-                (ny == by && (nx == bx-1 || nx == bx+1))
-          swapNumberAndBlank number (Board d layout)  = Board d $ map swappy layout
+
+          nextTo (Position bx by) (Position nx ny)    = abs (bx - nx) + abs (by - ny) == 1
+
+          swapNumberAndBlank number (Board d layout)  = Board d (map swappy layout)
               where swappy (Just n) | n == number = Nothing
                                     | otherwise   = (Just n)
                     swappy Nothing                = (Just number)
@@ -101,9 +103,8 @@ isStartingLayout board = board == calculateStartingBoard board
 -- Return what a given board would look like in its unscrambled, initial
 -- layout.
 calculateStartingBoard :: Board -> Board
-calculateStartingBoard (Board d _) =
-    Board d $ generateOrderedLayout d
-    where generateOrderedLayout (Dimensions width height) =
-              let lastNumber = width * height - 1
-               in (map Just [1 .. lastNumber]) ++ [Nothing]
-
+calculateStartingBoard (Board d _) = Board d (generateOrderedLayout d)
+  where
+    generateOrderedLayout (Dimensions width height) =
+      let lastNumber = width * height - 1
+      in  (map Just [1 .. lastNumber]) ++ [Nothing]
