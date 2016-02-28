@@ -6,6 +6,7 @@ import Board (Board, Dimensions(..), SlideError(..), Width, Height, newBoard, sl
 import System.IO
 import Data.Char
 import Data.List
+import qualified Text.Read
 import Screen (clearScreen)
 
 -- | Main "game loop".
@@ -88,24 +89,28 @@ winGame board = do
     putStrLn $ show board
     putStrLn "You won the game!\n"
 
+
+data TryRead a = Read a | TryAgain | Quit
+
 -- Prompt for and accept a positive number or Q to quit.
 getPositiveNumber :: String -> IO (Maybe Int)
-getPositiveNumber prompt = do queryUser
-    where parseNumber ""             = queryUser
-          parseNumber "Q"            = return Nothing
-          parseNumber response
-              | all isDigit response = ensurePositive $ read response
-              | otherwise            = reportError
-          ensurePositive number
-              | number > 0           = return $ Just number
-              | otherwise            = reportError
-          reportError = do
-              putStrLn "You must enter a positive number."
-              putStrLn ""
-              queryUser
+getPositiveNumber prompt = queryUser
+    where parseNumber :: String -> TryRead Int
+          parseNumber "q"      = Quit
+          parseNumber "Q"      = Quit
+          parseNumber response =
+              case Text.Read.readMaybe response of
+                  Just n | n > 0 -> Read n
+                  _              -> TryAgain
+
           queryUser = do
               putStr prompt
               hFlush stdout
               response <- getLine
-              parseNumber $ map toUpper response
+              case parseNumber response of
+                  TryAgain -> do
+                      putStrLn "You must enter a positive number.\n"
+                      queryUser
+                  Quit     -> return Nothing
+                  Read n   -> return (Just n)
 
