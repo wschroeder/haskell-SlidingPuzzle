@@ -89,8 +89,8 @@ getPositiveNumber prompt = queryUser
           parseNumber "Q"            = Quit
           parseNumber response =
             case Text.Read.readMaybe response of
-              Just n  -> Read n
-              Nothing -> TryAgain
+              Just n | n > 0 -> Read n
+              _              -> TryAgain
 
           queryUser = do
               putStr prompt
