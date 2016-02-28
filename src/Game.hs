@@ -94,8 +94,7 @@ winGame board = do
 
 -- Prompt for and accept a positive number or Q to quit.
 getPositiveNumber :: String -> IO (Maybe Int)
-getPositiveNumber prompt = do
-    queryUser
+getPositiveNumber prompt = do queryUser
     where parseNumber ""             = queryUser
           parseNumber "Q"            = return Nothing
           parseNumber response
