@@ -4,8 +4,6 @@ module Game (
 
 import Board (Board, Dimensions(..), SlideError(..), Width, Height, newBoard, slideNumber, isStartingLayout)
 import System.IO
-import Data.Char
-import Data.List
 import qualified Text.Read
 import Screen (clearScreen)
 
