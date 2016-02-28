@@ -56,12 +56,13 @@ playBoard :: Board -> IO ()
 playBoard board = do
     putStrLn $ show board
     number <- getPositiveNumber "Enter the number to move (Q to quit): "
-    trySlidingNumber number board
+    case number of
+        Just n  -> trySlidingNumber n board
+        Nothing -> abortGame
 
 -- Sixth success state: validate the move.
-trySlidingNumber :: Maybe Int -> Board -> IO ()
-trySlidingNumber Nothing _           = abortGame
-trySlidingNumber (Just number) board =
+trySlidingNumber :: Int -> Board -> IO ()
+trySlidingNumber number board =
     case slideNumber number board of
         Left InvalidNumber            -> reportError board "That number is not on the board."
         Left NumberNotAdjacentToBlank -> reportError board "That number is not next to the blank spot."
