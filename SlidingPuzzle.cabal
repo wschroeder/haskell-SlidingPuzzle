@@ -15,7 +15,7 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Menu, Game, Board
+  exposed-modules:     Screen, Menu, Game, Board
   build-depends:       base >= 4.7 && < 5
                      , random
                      , ansi-terminal

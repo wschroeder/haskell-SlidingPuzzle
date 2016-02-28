@@ -4,9 +4,9 @@ module Game (
 
 import Board (Board, Dimensions(..), SlideError(..), newBoard, slideNumber, isStartingLayout)
 import System.IO
-import System.Console.ANSI
 import Data.Char
 import Data.List
+import Screen (clearScreen)
 
 -- | Main "game loop".
 playGame :: IO ()
@@ -43,7 +43,6 @@ constructBoard width height = do
     putStrLn ""
     board <- newBoard $ Dimensions width height
     clearScreen
-    setCursorPosition 0 0
     playBoard board
 
 -- Easy state transition for aborting out of the game.
@@ -72,7 +71,6 @@ trySlidingNumber (Just number) board =
 reportError :: Board -> String -> IO ()
 reportError board error = do
     clearScreen
-    setCursorPosition 0 0
     putStrLn error
     putStrLn ""
     playBoard board
@@ -83,14 +81,12 @@ checkVictory board
     | isStartingLayout board = winGame board
     | otherwise              = do
         clearScreen
-        setCursorPosition 0 0
         playBoard board
 
 -- We won!  Throw confetti, and return to the main menu.
 winGame :: Board -> IO ()
 winGame board = do
     clearScreen
-    setCursorPosition 0 0
     putStrLn $ show board
     putStrLn "You won the game!"
     putStrLn ""

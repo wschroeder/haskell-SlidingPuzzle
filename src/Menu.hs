@@ -3,9 +3,9 @@ module Menu (
 ) where
 
 import System.IO
-import System.Console.ANSI
-import qualified Data.Char
+import Data.Char
 import Game as G
+import Screen (clearScreen)
 
 runMenu :: IO ()
 runMenu = do
@@ -18,7 +18,7 @@ runMenu = do
     putStr "Choice: "
     hFlush stdout
     response <- getLine
-    processInput $ map Data.Char.toUpper response
+    processInput $ map toUpper response
 
 processInput :: String -> IO ()
 processInput "P" = do
@@ -32,5 +32,4 @@ processInput _   = do
 
 respond message = do
     clearScreen
-    setCursorPosition 0 0
     putStrLn message
