@@ -8,6 +8,7 @@ import System.IO
 import System.Console.ANSI
 import Data.Char
 import Data.List
+import qualified Text.Read
 
 -- | Main "game loop".
 playGame :: IO ()
@@ -84,12 +85,12 @@ getPositiveNumber :: String -> IO (Maybe Int)
 getPositiveNumber prompt = queryUser
 
     where parseNumber :: String -> TryRead Int
-          parseNumber ""             = TryAgain
           parseNumber "q"            = Quit
           parseNumber "Q"            = Quit
-          parseNumber response | all isDigit response && (read response > 0) =
-            Read (read response)
-          parseNumber _              = TryAgain
+          parseNumber response =
+            case Text.Read.readMaybe response of
+              Just n  -> Read n
+              Nothing -> TryAgain
 
           queryUser = do
               putStr prompt
