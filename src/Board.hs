@@ -4,7 +4,9 @@ module Board (
     isStartingLayout,
     Dimensions(..),
     Board(..),
-    SlideError(..)
+    SlideError(..),
+    Width,
+    Height
 ) where
 
 import Data.List as L

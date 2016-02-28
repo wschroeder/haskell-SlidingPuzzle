@@ -2,7 +2,7 @@ module Game (
     playGame
 ) where
 
-import Board (Board, Dimensions(..), SlideError(..), newBoard, slideNumber, isStartingLayout)
+import Board (Board, Dimensions(..), SlideError(..), Width, Height, newBoard, slideNumber, isStartingLayout)
 import System.IO
 import Data.Char
 import Data.List
@@ -20,14 +20,14 @@ askAboutDimensions = do
     askAboutHeight width
 
 -- Second success state: choose the height.
-askAboutHeight :: Maybe Int -> IO ()
+askAboutHeight :: Maybe Width -> IO ()
 askAboutHeight Nothing = abortGame
 askAboutHeight width   = do
     height <- getPositiveNumber "How many spots high should the board be (Q to abort)? "
     verifySaneBoard width height
 
 -- Third success state is to validate width and height.
-verifySaneBoard :: Maybe Int -> Maybe Int -> IO ()
+verifySaneBoard :: Maybe Width -> Maybe Height -> IO ()
 verifySaneBoard Nothing _ = abortGame
 verifySaneBoard _ Nothing = abortGame
 verifySaneBoard (Just width) (Just height)
@@ -38,7 +38,7 @@ verifySaneBoard (Just width) (Just height)
         askAboutDimensions
 
 -- Fourth success state is to construct a board based on the given dimensions.
-constructBoard :: Int -> Int -> IO ()
+constructBoard :: Width -> Height -> IO ()
 constructBoard width height = do
     putStrLn ""
     board <- newBoard $ Dimensions width height
