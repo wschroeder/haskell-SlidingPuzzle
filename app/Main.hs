@@ -5,6 +5,6 @@ import Menu
 
 main :: IO ()
 main = do
-    clearScreen
-    runMenu
+  clearScreen
+  runMenu
 
