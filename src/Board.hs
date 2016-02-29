@@ -24,10 +24,9 @@ data NumberPosition a = NumberPosition a | NoNumberPosition
 data SlideError       = InvalidNumber | NumberNotAdjacentToBlank deriving (Show, Eq)
 
 instance Show Board where
-    show b@(Board (Dimensions width height) _) =
-        unlines $ map showRow [0..height-1]
-        where showRow y               = concat $ map (\x -> showPosition b $ Position x y) [0..width-1]
-              showPosition b p        = Text.printf "%2s " $ translateValue $ numberAt b p
+    show b@(Board (Dimensions width height) _) = unlines (map showRow [0..height-1])
+        where showRow y               = concatMap (\x -> showPosition b (Position x y)) [0..width-1]
+              showPosition b p        = Text.printf "%2s " (translateValue (numberAt b p))
               translateValue (NumberPosition Nothing)  = "__"
               translateValue (NumberPosition (Just x)) = show x
 
@@ -46,7 +45,7 @@ numberAt (Board (Dimensions width height) layout) (Position x y)
 -- the original board layout.
 scrambleBoard :: (R.RandomGen g) => Board -> Board -> g -> Board
 scrambleBoard board@(Board (Dimensions width height) _) startingBoard initialGen =
-    scrambleBoardLoop board initialGen $ (width * height)^2
+    scrambleBoardLoop board initialGen ((width * height)^2)
     where scrambleBoardLoop board gen 0          = board
           scrambleBoardLoop board gen iterations =
               let (moveIndex, newGen)   = R.randomR (0, 3) gen
@@ -54,7 +53,7 @@ scrambleBoard board@(Board (Dimensions width height) _) startingBoard initialGen
                   (Just (Position x y)) = positionOf Nothing board
                   newX                  = x + moveX
                   newY                  = y + moveY
-               in trySlideNumber board (numberAt board $ Position newX newY) newGen iterations
+               in trySlideNumber board (numberAt board (Position newX newY)) newGen iterations
           trySlideNumber board NoNumberPosition gen iterations               =
               scrambleBoardLoop board gen iterations
           trySlideNumber board (NumberPosition (Just number)) gen iterations =
@@ -68,14 +67,14 @@ scrambleBoard board@(Board (Dimensions width height) _) startingBoard initialGen
 newBoard :: Dimensions -> IO Board
 newBoard d = do
     newGen <- R.newStdGen
-    return $ scrambleBoard startingBoard startingBoard newGen
-    where startingBoard = calculateStartingBoard $ Board d []
+    return (scrambleBoard startingBoard startingBoard newGen)
+    where startingBoard = calculateStartingBoard (Board d [])
 
 -- Find where a number or Nothing is on the board.
 positionOf :: PositionValue -> Board -> Maybe Position
 positionOf item (Board (Dimensions width _) layout) =
     case L.elemIndex item layout of
-        Just index -> Just $ Position (index `rem` width) (index `div` width)
+        Just index -> Just (Position (index `rem` width) (index `div` width))
         Nothing    -> Nothing
 
 -- | Exchange the blank position with the given number if it is adjacent.
@@ -86,7 +85,7 @@ slideNumber number board =
           maybeNumberPosition                         = positionOf (Just number) board
           validateAndSlideNumber _ Nothing            = Left InvalidNumber
           validateAndSlideNumber (Just blankPosition) (Just numberPosition)
-                | nextTo blankPosition numberPosition = Right $ swapNumberAndBlank number board
+                | nextTo blankPosition numberPosition = Right (swapNumberAndBlank number board)
                 | otherwise                           = Left NumberNotAdjacentToBlank
           nextTo (Position bx by) (Position nx ny)    = above || below || leftOf || rightOf
               where above   = (nx == bx) && (ny == by - 1)

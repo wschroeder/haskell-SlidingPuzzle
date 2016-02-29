@@ -39,7 +39,7 @@ verifySaneBoard (Just width) (Just height)
 constructBoard :: Width -> Height -> IO ()
 constructBoard width height = do
     putStrLn ""
-    board <- newBoard $ Dimensions width height
+    board <- newBoard (Dimensions width height)
     clearScreen
     playBoard board
 
@@ -50,7 +50,7 @@ abortGame = putStrLn "Aborting game.\n"
 -- Fifth success state is to show the board and prompt the player for a move.
 playBoard :: Board -> IO ()
 playBoard board = do
-    putStrLn $ show board
+    putStrLn (show board)
     number <- getPositiveNumber "Enter the number to move (Q to quit): "
     case number of
         Just n  -> trySlidingNumber n board
@@ -84,7 +84,7 @@ checkVictory board
 winGame :: Board -> IO ()
 winGame board = do
     clearScreen
-    putStrLn $ show board
+    putStrLn (show board)
     putStrLn "You won the game!\n"
 
 

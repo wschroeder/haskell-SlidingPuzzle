@@ -18,7 +18,7 @@ runMenu = do
     putStr "Choice: "
     hFlush stdout
     response <- getLine
-    processInput $ map toUpper response
+    processInput (map toUpper response)
 
 processInput :: String -> IO ()
 processInput "P" = do
