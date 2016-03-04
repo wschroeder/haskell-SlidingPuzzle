@@ -17,7 +17,7 @@ library
   hs-source-dirs:      src
   exposed-modules:     Screen, Menu, Game, Board
   build-depends:       base >= 4.7 && < 5
-                     , random
+                     , MonadRandom
                      , ansi-terminal
   default-language:    Haskell2010
 

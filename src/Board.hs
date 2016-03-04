@@ -9,8 +9,9 @@ module Board (
   Height
 ) where
 
+import qualified Control.Monad.Random as Rand
+import           Control.Monad.Random.Class (MonadRandom(..))
 import qualified Data.List as L
-import qualified System.Random as R
 import qualified Text.Printf as Text
 
 type Width            = Int
@@ -43,31 +44,29 @@ numberAt (Board (Dimensions width height) layout) (Position x y)
 
 -- Slide numbers around the board until the layout is pretty far removed from
 -- the original board layout.
-scrambleBoard :: (R.RandomGen g) => Board -> Board -> g -> Board
-scrambleBoard board@(Board (Dimensions width height) _) startingBoard initialGen =
-  scrambleBoardLoop board initialGen ((width * height)^2)
-  where scrambleBoardLoop board gen 0          = board
-        scrambleBoardLoop board gen iterations =
-          let (moveIndex, newGen)   = R.randomR (0, 3) gen
-              (moveX, moveY)        = [(-1, 0), (1, 0), (0, -1), (0, 1)] !! moveIndex
+scrambleBoard :: MonadRandom m => Board -> Board -> m Board
+scrambleBoard board@(Board (Dimensions width height) _) startingBoard =
+  scrambleBoardLoop board ((width * height)^2)
+  where scrambleBoardLoop board 0          = return board
+        scrambleBoardLoop board iterations = do
+          moveIndex <- getRandomR (0, 3)
+          let (moveX, moveY)        = [(-1, 0), (1, 0), (0, -1), (0, 1)] !! moveIndex
               (Just (Position x y)) = positionOf Nothing board
               newX                  = x + moveX
               newY                  = y + moveY
-           in trySlideNumber board (numberAt board (Position newX newY)) newGen iterations
-        trySlideNumber board NoNumberPosition gen iterations               =
-          scrambleBoardLoop board gen iterations
-        trySlideNumber board (NumberPosition (Just number)) gen iterations =
+          trySlideNumber board (numberAt board (Position newX newY)) iterations
+        trySlideNumber board NoNumberPosition iterations               =
+          scrambleBoardLoop board iterations
+        trySlideNumber board (NumberPosition (Just number)) iterations =
           let (Right newBoard) = slideNumber number board
-           in verifyBoard newBoard gen iterations
-        verifyBoard board gen iterations
-          | board == startingBoard = scrambleBoardLoop board gen iterations
-          | otherwise              = scrambleBoardLoop board gen (iterations - 1)
+           in verifyBoard newBoard iterations
+        verifyBoard board iterations
+          | board == startingBoard = scrambleBoardLoop board iterations
+          | otherwise              = scrambleBoardLoop board (iterations - 1)
 
 -- | Randomly generate a new board, given dimensions.
 newBoard :: Dimensions -> IO Board
-newBoard d = do
-  newGen <- R.newStdGen
-  return (scrambleBoard startingBoard startingBoard newGen)
+newBoard d = Rand.evalRandIO (scrambleBoard startingBoard startingBoard)
   where startingBoard = calculateStartingBoard (Board d [])
 
 -- Find where a number or Nothing is on the board.
